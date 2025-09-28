@@ -131,10 +131,6 @@
               font-weight: 600;
           }
 
-          .app-link a:hover {
-              text-decoration: underline;
-          }
-
           .password-requirements {
               font-size: 12px;
               color: #666;
@@ -155,7 +151,7 @@
           </div>
 
           <div id="loading" class="loading">
-              <p>Verifying your reset link...</p>
+              <p>Processing reset link...</p>
           </div>
 
           <div id="resetForm" style="display: none;">
@@ -186,8 +182,7 @@
           <div id="message"></div>
 
           <div class="app-link">
-              <p><a href="gymassistance://app" onclick="setTimeout(() => window.close(), 100)">Open     
-  Gym Assistance App</a></p>
+              <p><a href="gymassistance://app">Open Gym Assistance App</a></p>
           </div>
       </div>
 
@@ -208,75 +203,29 @@
               messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`
           }
 
-          function validatePassword(password) {
-              const minLength = password.length >= 8
-              const hasLetter = /[a-zA-Z]/.test(password)
-              const hasNumber = /\d/.test(password)
-
-              return {
-                  isValid: minLength && hasLetter && hasNumber,
-                  minLength,
-                  hasLetter,
-                  hasNumber
-              }
-          }
-
-          // Check for auth tokens on page load
+          // Process the page on load
           window.addEventListener('load', async () => {
               try {
-                  // Check URL parameters for auth tokens
-                  const urlParams = new URLSearchParams(window.location.search)
-                  const hashParams = new URLSearchParams(window.location.hash.substring(1))
+                  // Wait a moment for Supabase to process any URL fragments
+                  await new Promise(resolve => setTimeout(resolve, 1000))
 
-                  // Check both URL params and hash params for auth tokens
-                  const accessToken = urlParams.get('access_token') ||
-  hashParams.get('access_token')
-                  const refreshToken = urlParams.get('refresh_token') ||
-  hashParams.get('refresh_token')
-                  const type = urlParams.get('type') || hashParams.get('type')
+                  // Check if we have a session (Supabase auto-processes reset links)
+                  const { data: { session }, error } = await supabase.auth.getSession()
 
-                  console.log('URL params:', Object.fromEntries(urlParams))
-                  console.log('Hash params:', Object.fromEntries(hashParams))
-                  console.log('Type:', type, 'Access token present:', !!accessToken)
-
-                  if (type === 'recovery' && accessToken) {
-                      // Set the session with the tokens from URL
-                      const { data, error } = await supabase.auth.setSession({
-                          access_token: accessToken,
-                          refresh_token: refreshToken
-                      })
-
-                      if (error) {
-                          console.error('Session set error:', error)
-                          loading.style.display = 'none'
-                          showMessage('Invalid or expired reset link. Please request a new password     
-  reset.')
-                          return
-                      }
-
-                      console.log('Session set successfully:', data)
+                  if (session) {
+                      // We have a valid session from the reset link
                       loading.style.display = 'none'
                       resetForm.style.display = 'block'
                   } else {
-                      // Check if we already have a session
-                      const { data: sessionData, error: sessionError } = await
-  supabase.auth.getSession()
-
-                      if (sessionError || !sessionData.session) {
-                          loading.style.display = 'none'
-                          showMessage('Invalid or expired reset link. Please request a new password     
-  reset from the app.')
-                          return
-                      }
-
+                      // No session - either invalid link or need to wait longer
                       loading.style.display = 'none'
-                      resetForm.style.display = 'block'
+                      showMessage('This reset link may be invalid or expired. Please request a new      
+  password reset from the app.')
                   }
 
               } catch (err) {
-                  console.error('Load error:', err)
                   loading.style.display = 'none'
-                  showMessage('Something went wrong. Please try again.')
+                  showMessage('Something went wrong. Please try again or request a new reset link.')    
               }
           })
 
@@ -291,14 +240,13 @@
                   return
               }
 
-              const validation = validatePassword(newPassword)
-              if (!validation.isValid) {
-                  let errorMsg = 'Password must:'
-                  if (!validation.minLength) errorMsg += ' be at least 8 characters long;'
-                  if (!validation.hasLetter) errorMsg += ' contain at least one letter;'
-                  if (!validation.hasNumber) errorMsg += ' contain at least one number;'
+              if (newPassword.length < 8) {
+                  showMessage('Password must be at least 8 characters long')
+                  return
+              }
 
-                  showMessage(errorMsg.replace(/;$/, '.'))
+              if (!/[a-zA-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
+                  showMessage('Password must contain at least one letter and one number')
                   return
               }
 
