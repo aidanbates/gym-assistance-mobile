@@ -1,297 +1,329 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - Gym Assistance</title>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Reset Password - Gym Assistance</title>
+      <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+      <style>
+          body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              margin: 0;
+              padding: 20px;
+              background: linear-gradient(135deg, #00D4FF 0%, #0099CC 100%);
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+          }
 
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-        }
+          .container {
+              background: white;
+              padding: 2rem;
+              border-radius: 16px;
+              box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+              width: 100%;
+              max-width: 400px;
+          }
 
-        .logo {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
+          .logo {
+              text-align: center;
+              margin-bottom: 2rem;
+          }
 
-        .logo h1 {
-            color: #00D4FF;
-            font-size: 28px;
-            font-weight: bold;
-            margin: 0;
-            margin-bottom: 0.5rem;
-        }
+          .logo h1 {
+              color: #00D4FF;
+              font-size: 28px;
+              font-weight: bold;
+              margin: 0;
+              margin-bottom: 0.5rem;
+          }
 
-        .logo p {
-            color: #666;
-            margin: 0;
-            font-size: 16px;
-        }
+          .logo p {
+              color: #666;
+              margin: 0;
+              font-size: 16px;
+          }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+          .form-group {
+              margin-bottom: 1.5rem;
+          }
 
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
-        }
+          label {
+              display: block;
+              margin-bottom: 0.5rem;
+              color: #333;
+              font-weight: 600;
+              font-size: 14px;
+          }
 
-        input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
+          input[type="password"] {
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #e1e5e9;
+              border-radius: 8px;
+              font-size: 16px;
+              box-sizing: border-box;
+              transition: border-color 0.2s;
+          }
 
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #00D4FF;
-        }
+          input[type="password"]:focus {
+              outline: none;
+              border-color: #00D4FF;
+          }
 
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: #00D4FF;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+          .btn {
+              width: 100%;
+              padding: 12px;
+              background: #00D4FF;
+              color: white;
+              border: none;
+              border-radius: 8px;
+              font-size: 16px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: background 0.2s;
+          }
 
-        .btn:hover {
-            background: #00B8E6;
-        }
+          .btn:hover {
+              background: #00B8E6;
+          }
 
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
+          .btn:disabled {
+              background: #ccc;
+              cursor: not-allowed;
+          }
 
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
+          .message {
+              padding: 12px;
+              border-radius: 8px;
+              margin-bottom: 1rem;
+              text-align: center;
+          }
 
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
+          .success {
+              background: #d4edda;
+              color: #155724;
+              border: 1px solid #c3e6cb;
+          }
 
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+          .error {
+              background: #f8d7da;
+              color: #721c24;
+              border: 1px solid #f5c6cb;
+          }
 
-        .loading {
-            text-align: center;
-            color: #666;
-        }
+          .loading {
+              text-align: center;
+              color: #666;
+          }
 
-        .app-link {
-            text-align: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e1e5e9;
-        }
+          .app-link {
+              text-align: center;
+              margin-top: 1rem;
+              padding-top: 1rem;
+              border-top: 1px solid #e1e5e9;
+          }
 
-        .app-link a {
-            color: #00D4FF;
-            text-decoration: none;
-            font-weight: 600;
-        }
+          .app-link a {
+              color: #00D4FF;
+              text-decoration: none;
+              font-weight: 600;
+          }
 
-        .app-link a:hover {
-            text-decoration: underline;
-        }
+          .app-link a:hover {
+              text-decoration: underline;
+          }
 
-        .password-requirements {
-            font-size: 12px;
-            color: #666;
-            margin-top: 0.5rem;
-        }
+          .password-requirements {
+              font-size: 12px;
+              color: #666;
+              margin-top: 0.5rem;
+          }
 
-        .password-requirements ul {
-            margin: 0.5rem 0;
-            padding-left: 1rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <h1>🏋️ Gym Assistance</h1>
-            <p>Reset Your Password</p>
-        </div>
+          .password-requirements ul {
+              margin: 0.5rem 0;
+              padding-left: 1rem;
+          }
+      </style>
+  </head>
+  <body>
+      <div class="container">
+          <div class="logo">
+              <h1>🏋️ Gym Assistance</h1>
+              <p>Reset Your Password</p>
+          </div>
 
-        <div id="loading" class="loading">
-            <p>Verifying your reset link...</p>
-        </div>
+          <div id="loading" class="loading">
+              <p>Verifying your reset link...</p>
+          </div>
 
-        <div id="resetForm" style="display: none;">
-            <form id="passwordResetForm">
-                <div class="form-group">
-                    <label for="newPassword">New Password</label>
-                    <input type="password" id="newPassword" required minlength="8"
-                           placeholder="Enter your new password">
-                    <div class="password-requirements">
-                        <strong>Password requirements:</strong>
-                        <ul>
-                            <li>At least 8 characters long</li>
-                            <li>Contains both letters and numbers</li>
-                        </ul>
-                    </div>
-                </div>
+          <div id="resetForm" style="display: none;">
+              <form id="passwordResetForm">
+                  <div class="form-group">
+                      <label for="newPassword">New Password</label>
+                      <input type="password" id="newPassword" required minlength="8"
+                             placeholder="Enter your new password">
+                      <div class="password-requirements">
+                          <strong>Password requirements:</strong>
+                          <ul>
+                              <li>At least 8 characters long</li>
+                              <li>Contains both letters and numbers</li>
+                          </ul>
+                      </div>
+                  </div>
 
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" required minlength="8"
-                           placeholder="Confirm your new password">
-                </div>
+                  <div class="form-group">
+                      <label for="confirmPassword">Confirm Password</label>
+                      <input type="password" id="confirmPassword" required minlength="8"
+                             placeholder="Confirm your new password">
+                  </div>
 
-                <button type="submit" class="btn" id="submitBtn">Update Password</button>
-            </form>
-        </div>
+                  <button type="submit" class="btn" id="submitBtn">Update Password</button>
+              </form>
+          </div>
 
-        <div id="message"></div>
+          <div id="message"></div>
 
-        <div class="app-link">
-            <p><a href="gymassistance://app" onclick="setTimeout(() => window.close(), 100)">Open Gym Assistance App</a></p>
-        </div>
-    </div>
+          <div class="app-link">
+              <p><a href="gymassistance://app" onclick="setTimeout(() => window.close(), 100)">Open     
+  Gym Assistance App</a></p>
+          </div>
+      </div>
 
-    <script>
-        const supabaseUrl = 'https://mmuwsslkdfxkpcvpbxxh.supabase.co'
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tdXdzc2xrZGZ4a3BjdnBieHhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NzY0NTYsImV4cCI6MjA0NzQ1MjQ1Nn0.QGnH9JJMnTHh7Laq8CKRnhY_L-6FEOxjFq9jmKp0p_Y'
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+      <script>
+          const supabaseUrl = 'https://mmuwsslkdfxkpcvpbxxh.supabase.co'
+          const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6    
+  Im1tdXdzc2xrZGZ4a3BjdnBieHhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NzY0NTYsImV4cCI6MjA0NzQ1MjQ1Nn0.QG    
+  nH9JJMnTHh7Laq8CKRnhY_L-6FEOxjFq9jmKp0p_Y'
+          const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
 
-        const loading = document.getElementById('loading')
-        const resetForm = document.getElementById('resetForm')
-        const messageDiv = document.getElementById('message')
-        const form = document.getElementById('passwordResetForm')
-        const submitBtn = document.getElementById('submitBtn')
+          const loading = document.getElementById('loading')
+          const resetForm = document.getElementById('resetForm')
+          const messageDiv = document.getElementById('message')
+          const form = document.getElementById('passwordResetForm')
+          const submitBtn = document.getElementById('submitBtn')
 
-        function showMessage(text, type = 'error') {
-            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`
-        }
+          function showMessage(text, type = 'error') {
+              messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`
+          }
 
-        function validatePassword(password) {
-            const minLength = password.length >= 8
-            const hasLetter = /[a-zA-Z]/.test(password)
-            const hasNumber = /\d/.test(password)
+          function validatePassword(password) {
+              const minLength = password.length >= 8
+              const hasLetter = /[a-zA-Z]/.test(password)
+              const hasNumber = /\d/.test(password)
 
-            return {
-                isValid: minLength && hasLetter && hasNumber,
-                minLength,
-                hasLetter,
-                hasNumber
-            }
-        }
+              return {
+                  isValid: minLength && hasLetter && hasNumber,
+                  minLength,
+                  hasLetter,
+                  hasNumber
+              }
+          }
 
-        // Check if we have valid session from email link
-        window.addEventListener('load', async () => {
-            try {
-                // Parse URL hash fragments for Supabase auth
-                const hashParams = new URLSearchParams(window.location.hash.substring(1))
+          // Check for auth tokens on page load
+          window.addEventListener('load', async () => {
+              try {
+                  // Check URL parameters for auth tokens
+                  const urlParams = new URLSearchParams(window.location.search)
+                  const hashParams = new URLSearchParams(window.location.hash.substring(1))
 
-                if (hashParams.get('type') === 'recovery') {
-                    // This is a recovery link, show the form
-                    loading.style.display = 'none'
-                    resetForm.style.display = 'block'
-                } else {
-                    // Check for existing session
-                    const { data, error } = await supabase.auth.getSession()
+                  // Check both URL params and hash params for auth tokens
+                  const accessToken = urlParams.get('access_token') ||
+  hashParams.get('access_token')
+                  const refreshToken = urlParams.get('refresh_token') ||
+  hashParams.get('refresh_token')
+                  const type = urlParams.get('type') || hashParams.get('type')
 
-                    if (error || !data.session) {
-                        loading.style.display = 'none'
-                        showMessage('Invalid or expired reset link. Please request a new password reset from the app.')
-                        return
-                    }
+                  console.log('URL params:', Object.fromEntries(urlParams))
+                  console.log('Hash params:', Object.fromEntries(hashParams))
+                  console.log('Type:', type, 'Access token present:', !!accessToken)
 
-                    // Valid session, show reset form
-                    loading.style.display = 'none'
-                    resetForm.style.display = 'block'
-                }
+                  if (type === 'recovery' && accessToken) {
+                      // Set the session with the tokens from URL
+                      const { data, error } = await supabase.auth.setSession({
+                          access_token: accessToken,
+                          refresh_token: refreshToken
+                      })
 
-            } catch (err) {
-                loading.style.display = 'none'
-                showMessage('Something went wrong. Please try again.')
-            }
-        })
+                      if (error) {
+                          console.error('Session set error:', error)
+                          loading.style.display = 'none'
+                          showMessage('Invalid or expired reset link. Please request a new password     
+  reset.')
+                          return
+                      }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault()
+                      console.log('Session set successfully:', data)
+                      loading.style.display = 'none'
+                      resetForm.style.display = 'block'
+                  } else {
+                      // Check if we already have a session
+                      const { data: sessionData, error: sessionError } = await
+  supabase.auth.getSession()
 
-            const newPassword = document.getElementById('newPassword').value
-            const confirmPassword = document.getElementById('confirmPassword').value
+                      if (sessionError || !sessionData.session) {
+                          loading.style.display = 'none'
+                          showMessage('Invalid or expired reset link. Please request a new password     
+  reset from the app.')
+                          return
+                      }
 
-            if (newPassword !== confirmPassword) {
-                showMessage('Passwords do not match')
-                return
-            }
+                      loading.style.display = 'none'
+                      resetForm.style.display = 'block'
+                  }
 
-            const validation = validatePassword(newPassword)
-            if (!validation.isValid) {
-                let errorMsg = 'Password must:'
-                if (!validation.minLength) errorMsg += ' be at least 8 characters long;'
-                if (!validation.hasLetter) errorMsg += ' contain at least one letter;'
-                if (!validation.hasNumber) errorMsg += ' contain at least one number;'
+              } catch (err) {
+                  console.error('Load error:', err)
+                  loading.style.display = 'none'
+                  showMessage('Something went wrong. Please try again.')
+              }
+          })
 
-                showMessage(errorMsg.replace(/;$/, '.'))
-                return
-            }
+          form.addEventListener('submit', async (e) => {
+              e.preventDefault()
 
-            submitBtn.disabled = true
-            submitBtn.textContent = 'Updating...'
+              const newPassword = document.getElementById('newPassword').value
+              const confirmPassword = document.getElementById('confirmPassword').value
 
-            try {
-                const { error } = await supabase.auth.updateUser({
-                    password: newPassword
-                })
+              if (newPassword !== confirmPassword) {
+                  showMessage('Passwords do not match')
+                  return
+              }
 
-                if (error) {
-                    showMessage(error.message)
-                } else {
-                    showMessage('Password updated successfully! 🎉 You can now sign in to the Gym Assistance app with your new password.', 'success')
-                    form.style.display = 'none'
-                }
-            } catch (err) {
-                showMessage('Something went wrong. Please try again.')
-            } finally {
-                submitBtn.disabled = false
-                submitBtn.textContent = 'Update Password'
-            }
-        })
-    </script>
-</body>
-</html>
+              const validation = validatePassword(newPassword)
+              if (!validation.isValid) {
+                  let errorMsg = 'Password must:'
+                  if (!validation.minLength) errorMsg += ' be at least 8 characters long;'
+                  if (!validation.hasLetter) errorMsg += ' contain at least one letter;'
+                  if (!validation.hasNumber) errorMsg += ' contain at least one number;'
+
+                  showMessage(errorMsg.replace(/;$/, '.'))
+                  return
+              }
+
+              submitBtn.disabled = true
+              submitBtn.textContent = 'Updating...'
+
+              try {
+                  const { error } = await supabase.auth.updateUser({
+                      password: newPassword
+                  })
+
+                  if (error) {
+                      showMessage(error.message)
+                  } else {
+                      showMessage('Password updated successfully! 🎉 You can now sign in to the Gym     
+  Assistance app with your new password.', 'success')
+                      form.style.display = 'none'
+                  }
+              } catch (err) {
+                  showMessage('Something went wrong. Please try again.')
+              } finally {
+                  submitBtn.disabled = false
+                  submitBtn.textContent = 'Update Password'
+              }
+          })
+      </script>
+  </body>
+  </html>
