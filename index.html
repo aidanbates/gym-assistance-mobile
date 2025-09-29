@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -113,6 +113,12 @@
               border: 1px solid #f5c6cb;
           }
 
+          .info {
+              background: #d1ecf1;
+              color: #0c5460;
+              border: 1px solid #bee5eb;
+          }
+
           .app-link {
               text-align: center;
               margin-top: 1rem;
@@ -136,6 +142,16 @@
               margin: 0.5rem 0;
               padding-left: 1rem;
           }
+
+          .debug {
+              font-size: 12px;
+              color: #666;
+              margin-top: 1rem;
+              padding: 10px;
+              background: #f8f9fa;
+              border-radius: 4px;
+              word-break: break-all;
+          }
       </style>
   </head>
   <body>
@@ -144,6 +160,8 @@
               <h1>🏋️ Gym Assistance</h1>
               <p>Reset Your Password</p>
           </div>
+
+          <div id="sessionInfo"></div>
 
           <div id="resetForm">
               <form id="passwordResetForm">
@@ -171,6 +189,7 @@
           </div>
 
           <div id="message"></div>
+          <div id="debug" class="debug"></div>
 
           <div class="app-link">
               <p><a href="gymassistance://app">Open Gym Assistance App</a></p>
@@ -182,10 +201,18 @@
           const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6    
   Im1tdXdzc2xrZGZ4a3BjdnBieHhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NzY0NTYsImV4cCI6MjA0NzQ1MjQ1Nn0.QG    
   nH9JJMnTHh7Laq8CKRnhY_L-6FEOxjFq9jmKp0p_Y'
-          const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+
+          const supabase = window.supabase.createClient(supabaseUrl, supabaseKey, {
+              auth: {
+                  detectSessionInUrl: true,
+                  persistSession: true
+              }
+          })
 
           const resetForm = document.getElementById('resetForm')
           const messageDiv = document.getElementById('message')
+          const sessionInfoDiv = document.getElementById('sessionInfo')
+          const debugDiv = document.getElementById('debug')
           const form = document.getElementById('passwordResetForm')
           const submitBtn = document.getElementById('submitBtn')
 
@@ -193,8 +220,38 @@
               messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`
           }
 
-          // Just show the form immediately - Supabase will handle the session validation when
-  updating
+          function showDebug(text) {
+              debugDiv.innerHTML = text
+          }
+
+          // Check session on load
+          window.addEventListener('load', async () => {
+              try {
+                  // Check URL for fragments
+                  const url = window.location.href
+                  const hasFragment = url.includes('#')
+                  showDebug(`URL: ${url}<br>Has fragment: ${hasFragment}`)
+
+                  // Wait for Supabase to process URL
+                  await new Promise(resolve => setTimeout(resolve, 1000))
+
+                  const { data: { session }, error } = await supabase.auth.getSession()
+
+                  if (session) {
+                      sessionInfoDiv.innerHTML = '<div class="message info">✅ Valid reset session      
+  detected</div>'
+                      showDebug(`Session found: User ${session.user.email}`)
+                  } else {
+                      sessionInfoDiv.innerHTML = '<div class="message error">❌ No valid session        
+  found</div>'
+                      showDebug(`No session. Error: ${error?.message || 'none'}`)
+                  }
+
+              } catch (err) {
+                  showDebug(`Error: ${err.message}`)
+              }
+          })
+
           form.addEventListener('submit', async (e) => {
               e.preventDefault()
 
@@ -220,22 +277,35 @@
               submitBtn.textContent = 'Updating...'
 
               try {
-                  // Supabase automatically handles the session from the URL
-                  const { error } = await supabase.auth.updateUser({
+                  // Check session before attempting update
+                  const { data: { session } } = await supabase.auth.getSession()
+
+                  if (!session) {
+                      showMessage('No valid session. Please use a fresh reset link from your
+  email.')
+                      showDebug('No session found during password update')
+                      return
+                  }
+
+                  showDebug(`Attempting password update for user: ${session.user.email}`)
+
+                  const { data, error } = await supabase.auth.updateUser({
                       password: newPassword
                   })
 
                   if (error) {
-                      showMessage('Reset link may be invalid or expired. Please request a new
-  password reset from the app.')
+                      showMessage(`Error: ${error.message}`)
+                      showDebug(`Update error: ${error.message}`)
                   } else {
                       showMessage('Password updated successfully! 🎉 You can now sign in to the Gym     
   Assistance app with your new password.', 'success')
+                      showDebug('Password update successful')
                       form.style.display = 'none'
                   }
               } catch (err) {
                   showMessage('Something went wrong. Please request a new password reset from the       
   app.')
+                  showDebug(`Unexpected error: ${err.message}`)
               } finally {
                   submitBtn.disabled = false
                   submitBtn.textContent = 'Update Password'
