@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8">
@@ -113,11 +113,6 @@
               border: 1px solid #f5c6cb;
           }
 
-          .loading {
-              text-align: center;
-              color: #666;
-          }
-
           .app-link {
               text-align: center;
               margin-top: 1rem;
@@ -150,11 +145,7 @@
               <p>Reset Your Password</p>
           </div>
 
-          <div id="loading" class="loading">
-              <p>Processing reset link...</p>
-          </div>
-
-          <div id="resetForm" style="display: none;">
+          <div id="resetForm">
               <form id="passwordResetForm">
                   <div class="form-group">
                       <label for="newPassword">New Password</label>
@@ -193,7 +184,6 @@
   nH9JJMnTHh7Laq8CKRnhY_L-6FEOxjFq9jmKp0p_Y'
           const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
 
-          const loading = document.getElementById('loading')
           const resetForm = document.getElementById('resetForm')
           const messageDiv = document.getElementById('message')
           const form = document.getElementById('passwordResetForm')
@@ -203,32 +193,8 @@
               messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`
           }
 
-          // Process the page on load
-          window.addEventListener('load', async () => {
-              try {
-                  // Wait a moment for Supabase to process any URL fragments
-                  await new Promise(resolve => setTimeout(resolve, 1000))
-
-                  // Check if we have a session (Supabase auto-processes reset links)
-                  const { data: { session }, error } = await supabase.auth.getSession()
-
-                  if (session) {
-                      // We have a valid session from the reset link
-                      loading.style.display = 'none'
-                      resetForm.style.display = 'block'
-                  } else {
-                      // No session - either invalid link or need to wait longer
-                      loading.style.display = 'none'
-                      showMessage('This reset link may be invalid or expired. Please request a new      
-  password reset from the app.')
-                  }
-
-              } catch (err) {
-                  loading.style.display = 'none'
-                  showMessage('Something went wrong. Please try again or request a new reset link.')    
-              }
-          })
-
+          // Just show the form immediately - Supabase will handle the session validation when
+  updating
           form.addEventListener('submit', async (e) => {
               e.preventDefault()
 
@@ -254,19 +220,22 @@
               submitBtn.textContent = 'Updating...'
 
               try {
+                  // Supabase automatically handles the session from the URL
                   const { error } = await supabase.auth.updateUser({
                       password: newPassword
                   })
 
                   if (error) {
-                      showMessage(error.message)
+                      showMessage('Reset link may be invalid or expired. Please request a new
+  password reset from the app.')
                   } else {
                       showMessage('Password updated successfully! 🎉 You can now sign in to the Gym     
   Assistance app with your new password.', 'success')
                       form.style.display = 'none'
                   }
               } catch (err) {
-                  showMessage('Something went wrong. Please try again.')
+                  showMessage('Something went wrong. Please request a new password reset from the       
+  app.')
               } finally {
                   submitBtn.disabled = false
                   submitBtn.textContent = 'Update Password'
